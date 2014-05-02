@@ -1,7 +1,9 @@
 package ghostdriver.setup;
 
 import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.NoSuchElementException;
@@ -22,11 +24,13 @@ public class DriverFactory
 	private static WebDriver driver;
 	private static Wait<WebDriver> wait;
 	protected static DesiredCapabilities dcaps;
+	protected static Properties config;
 
-//	 private static String BROWSER = "ie";
-//	 private static String BROWSER = "firefox";
-//	 private static String BROWSER = "chrome";
-	private static String BROWSER = "phantom";
+	private static final String CONFIG_FILE = "src/test/resources/config.properties";
+	private static final String DRIVER_PHANTOMJS = "phantomjs";
+	private static final String DRIVER_IE = "ie";
+	private static final String DRIVER_FIREFOX = "firefox";
+	private static final String DRIVER_CHROME = "chrome";
 
 	public static WebDriver getDriver()
 	{
@@ -44,28 +48,9 @@ public class DriverFactory
 
 	public static WebDriver createDriver()
 	{
-		if (BROWSER == "ie")
-		{
-			dcaps = DesiredCapabilities.internetExplorer();
-			File file = new File("src/test/resources/IEDriverServer.exe");
-			System.setProperty("webdriver.ie.driver", file.getAbsolutePath());
-			dcaps.setJavascriptEnabled(true);
-			driver = new InternetExplorerDriver(dcaps);
-		}
-		if (BROWSER == "firefox")
-		{
-			driver = new FirefoxDriver();
-			driver.manage().window().maximize();
-		}
-		if (BROWSER == "chrome")
-		{
-			File file = new File("src/test/resources/chromedriver.exe");
-			System.setProperty("webdriver.chrome.driver",
-					file.getAbsolutePath());
-			driver = new ChromeDriver();
-			driver.manage().window().maximize();
-		}
-		if (BROWSER == "phantom")
+		String driverProperty = getProperty("driver");
+		
+		if (driverProperty.equals(DRIVER_PHANTOMJS))
 		{
 			dcaps = DesiredCapabilities.phantomjs();
 			File file = new File("src/test/resources/phantomjs.exe");
@@ -82,6 +67,27 @@ public class DriverFactory
 			dcaps.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS,
 					cliArgsCap);
 			driver = new PhantomJSDriver(dcaps);
+			driver.manage().window().maximize();
+		}
+		if (driverProperty.equals(DRIVER_IE))
+		{
+			dcaps = DesiredCapabilities.internetExplorer();
+			File file = new File("src/test/resources/IEDriverServer.exe");
+			System.setProperty("webdriver.ie.driver", file.getAbsolutePath());
+			dcaps.setJavascriptEnabled(true);
+			driver = new InternetExplorerDriver(dcaps);
+		}
+		if (driverProperty.equals(DRIVER_FIREFOX))
+		{
+			driver = new FirefoxDriver();
+			driver.manage().window().maximize();
+		}
+		if (driverProperty.equals(DRIVER_CHROME))
+		{
+			File file = new File("src/test/resources/chromedriver.exe");
+			System.setProperty("webdriver.chrome.driver",
+					file.getAbsolutePath());
+			driver = new ChromeDriver();
 			driver.manage().window().maximize();
 		}
 
@@ -101,18 +107,13 @@ public class DriverFactory
 		return wait;
 	}
 
-	public static String getBrowser()
-	{
-		return BROWSER;
-	}
-
 	public static Wait<WebDriver> createWait(long withTimeout, long pollingEvery)
 	{
 		return new FluentWait<WebDriver>(getDriver())
 				.withTimeout(withTimeout, TimeUnit.SECONDS)
 				.pollingEvery(pollingEvery, TimeUnit.SECONDS)
 				.ignoring(NoSuchElementException.class)
-				.ignoring(StaleElementReferenceException.class);
+				.ignoring(StaleElementReferenceException.class);		
 	}
 
 	public static Wait<WebDriver> createWaitDefault(long withTimeout,
@@ -120,5 +121,26 @@ public class DriverFactory
 	{
 		return new FluentWait<WebDriver>(getDriver()).withTimeout(withTimeout,
 				TimeUnit.SECONDS).pollingEvery(pollingEvery, TimeUnit.SECONDS);
+	}
+	
+	private static Properties loadPropertiesFile() throws Exception
+	{
+		config = new Properties();
+		config.load(new FileReader(CONFIG_FILE));
+
+		return config;
+	}
+
+	public static String getProperty(String property)
+	{
+		try {
+			Properties file = loadPropertiesFile();
+			return file.getProperty(property, DRIVER_PHANTOMJS);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			return "Could not get property from config file";
+		}
 	}
 }

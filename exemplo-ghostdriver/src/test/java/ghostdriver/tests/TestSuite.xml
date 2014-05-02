@@ -4,7 +4,7 @@
     <classes>
        <class name="ghostdriver.tests.CarrinhoComprasTest" />
        <class name="ghostdriver.tests.CompararProdutosTest" />
-       <class name="ghostdriver.tests.MapaSiteTest" />
+       <class name="ghostdriver.tests.MapaSiteTest" />       
     </classes>
   </test>
 </suite>
