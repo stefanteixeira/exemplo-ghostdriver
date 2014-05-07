@@ -34,11 +34,7 @@ public class DriverFactory
 
 	public static WebDriver getDriver()
 	{
-		if (driver == null)
-		{
-			createDriver();
-		}
-		if(((RemoteWebDriver) driver).getSessionId() == null)
+		if (driver == null || ((RemoteWebDriver) driver).getSessionId() == null)
 		{
 			createDriver();
 		}
@@ -140,7 +136,7 @@ public class DriverFactory
 		catch (Exception e)
 		{
 			e.printStackTrace();
-			return "Could not get property from config file";
+			return "Não foi possível carregar a propriedade do arquivo de configurações";
 		}
 	}
 }

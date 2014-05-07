@@ -8,8 +8,8 @@ import org.testng.annotations.Test;
 
 public class CarrinhoComprasTest extends BaseTest
 {
-	private static HomePage home;
-	private static CarrinhoComprasPage carrinho;
+	private HomePage home;
+	private CarrinhoComprasPage carrinho;
 
 	@Test
 	public void adicionarLivroCarrinho()
