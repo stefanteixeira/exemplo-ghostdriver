@@ -136,7 +136,7 @@ public class DriverFactory
 		catch (Exception e)
 		{
 			e.printStackTrace();
-			return "Não foi possível carregar a propriedade do arquivo de configurações";
+			return "Não foi possível carregar a propriedade do arquivo de configurações.";
 		}
 	}
 }
